@@ -1,0 +1,7 @@
+-cp src
+-lib heaps
+-lib hlsdl
+-hl hello2d.hl
+-main Main2d
+-D windowSize=1024x1024
+-debug
