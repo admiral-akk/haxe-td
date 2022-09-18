@@ -1,143 +1,68 @@
-class King {
-	public var kingBmp:h2d.Bitmap;
-
-	var x:Int;
-	var y:Int;
-	var time:Float;
-	var timeToMove:Float;
-	var animation:Null<MoveAnimation>;
-
-	public function new(bmp:h2d.Bitmap, x:Int, y:Int) {
-		this.kingBmp = bmp;
-		this.x = x;
-		this.y = y;
-	}
-
-	public function update(dt:Float) {
-		timeToMove -= dt;
-		if (timeToMove < 0) {
-			timeToMove = 2;
-			var start = new Point(x, y);
-			var end = new Point(x, y);
-			if (x == 0 && y < 15) {
-				end.y += 1;
-			}
-			if (x < 15 && y == 15) {
-				end.x += 1;
-			}
-			if (x == 15 && y > 0) {
-				end.y -= 1;
-			}
-			if (x > 0 && y == 0) {
-				end.x -= 1;
-			}
-
-			x = Std.int(end.x);
-			y = Std.int(end.y);
-
-			this.animation = new MoveAnimation(kingBmp, start, end, 1.5);
-		}
-		time += dt;
-		if (this.animation != null) {
-			this.animation.update(dt);
-		}
-
-		kingBmp.rotation = Math.sin(5 * time) / 2;
-	}
-}
-
-class Point {
-	public var x:Float;
-	public var y:Float;
-
-	public function new(x:Float, y:Float) {
-		this.x = x;
-		this.y = y;
-	}
-
-	public function lerp(other:Point, t:Float):Point {
-		return new Point((1 - t) * x + t * other.x, (1 - t) * y + t * other.y);
-	}
-}
-
-class MoveAnimation {
-	public var start:Point;
-	public var end:Point;
-
-	var t:Float;
-	var length:Float;
-	var target:h2d.Bitmap;
-
-	function curve(x:Float):Float {
-		var c1 = 1.70158;
-		var c3 = c1 + 1;
-
-		return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
-	}
-
-	public function new(target:h2d.Bitmap, start:Point, end:Point, length:Float) {
-		this.start = start;
-		this.end = end;
-		this.t = 0;
-		this.length = length;
-		this.target = target;
-	}
-
-	function animate() {
-		var p = this.start.lerp(this.end, curve(t / length));
-		this.target.x = p.x * 16 + 8;
-		this.target.y = p.y * 16 + 8;
-	}
-
-	public function update(dt:Float) {
-		t += dt;
-		if (t >= length) {
-			t = length;
-		}
-		animate();
-	}
-}
+import creep.King;
 
 class Main2d extends hxd.App {
 	var king:King;
+	var target:h2d.Bitmap;
+	var time:Float;
 
 	override private function init():Void {
 		super.init();
+		s2d.scaleMode = h2d.Scene.ScaleMode.LetterBox(512, 512);
 
-		var tileMap = hxd.Res.img.tilemap_packed.toTile();
+		var top_ui = new h2d.Object(s2d);
+		var font:h2d.Font = hxd.res.DefaultFont.get();
+		var tf = new h2d.Text(font);
+		tf.text = "Lives: 10";
+		tf.textAlign = Left;
+		top_ui.addChild(tf);
+		var tf2 = new h2d.Text(font);
+		tf2.text = "Gold: 10";
+		tf2.setPosition(512, 0);
+		tf2.textAlign = Right;
+		top_ui.addChild(tf2);
+
+		var game = new h2d.Object(s2d);
+		game.setPosition(0, 128);
+		var bottom_ui = new h2d.Object(s2d);
+
+		bottom_ui.setPosition(0, 512 - 128);
+
 		var tileWidth = 16;
 		var tileHeight = 16;
-		var width = tileMap.width / tileWidth;
-		var height = tileMap.height / tileHeight;
 
-		var tileGroup = new h2d.TileGroup(tileMap, s2d);
+		var map = new GameMap();
+		game.addChild(map);
+		target = new h2d.Bitmap(TileLoader.Guard(), map);
 
-		var tiles = [
-			for (y in 0...Std.int(height))
-				for (x in 0...Std.int(width))
-					tileMap.sub(x * tileWidth, y * tileHeight, tileWidth, tileHeight)
-		];
-
-		var ground = tiles[0];
-		var kingTile = tiles[23 * 4 - 1];
-
-		s2d.scaleMode = h2d.Scene.ScaleMode.LetterBox(256, 256);
-
+		// add to any parent, in this case we append to root
 		for (y in 0...16)
-			for (x in 0...16)
-				tileGroup.add(x * tileWidth, y * tileHeight, ground);
+			for (x in 0...32) {
+				var selectObject = new h2d.Object(map);
+				selectObject.setPosition(x * tileWidth, y * tileHeight);
+				var interaction = new h2d.Interactive(16, 16, selectObject);
+				interaction.onOver = function(event:hxd.Event) {
+					trace("Over " + x + " " + y);
+					target.alpha = 0.6;
+					target.setPosition(x * 16, y * 16);
+				}
 
-		s2d.addChild(tileGroup);
-		var kingBmp = new h2d.Bitmap(kingTile);
-		kingBmp.tile.dx = -8;
-		kingBmp.tile.dy = -8;
-		kingBmp.setPosition(8, 8);
-		king = new King(kingBmp, 0, 0);
-		tileGroup.addChild(kingBmp);
+				interaction.onOut = function(event:hxd.Event) {
+					trace("out " + x + " " + y);
+					target.alpha = 0.;
+				}
+				// tileGroup.add(x * tileWidth, y * tileHeight, ground);
+			}
+		king = new King(0, 0);
+		map.addChild(king);
 	}
 
 	override function update(dt:Float) {
-		king.update(dt);
+		king.viewUpdate(dt);
+		time -= dt;
+		if (time < 0) {
+			king.gameUpdate();
+			time += 2;
+		}
 	}
 
 	static function main() {
