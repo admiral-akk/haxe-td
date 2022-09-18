@@ -50,6 +50,10 @@ class Main2d extends hxd.App {
 					trace("out " + x + " " + y);
 					target.alpha = 0.;
 				}
+				interaction.onClick = function(event:hxd.Event) {
+					var tower = new Tower(x, y, map);
+					map.PlaceTower(tower);
+				}
 				// tileGroup.add(x * tileWidth, y * tileHeight, ground);
 			}
 		king = new King(0, 0, map);

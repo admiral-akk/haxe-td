@@ -6,6 +6,10 @@ class Pathfinder {
 
 	public function new(map:GameMap) {
 		this.map = map;
+		Recompute();
+	}
+
+	public function Recompute() {
 		dist = new HashMap();
 		var queue = new Array();
 		for (building in map.buildings) {
@@ -17,6 +21,10 @@ class Pathfinder {
 		while (queue.length > 0) {
 			var next = queue.pop();
 			if (dist.exists(next)) {
+				continue;
+			}
+			if (map.towers.exists(next)) {
+				dist.set(next, 1000);
 				continue;
 			}
 
