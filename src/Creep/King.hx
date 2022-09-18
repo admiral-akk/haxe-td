@@ -4,36 +4,26 @@ import animation.MoveAnimation;
 
 class King extends h2d.Object {
 	var image:h2d.Bitmap;
-	var pos:Point;
+	var pos:Position;
+	var map:GameMap;
 
 	var time:Float;
 	var animation:Null<MoveAnimation>;
 
-	public function new(x:Int, y:Int) {
+	public function new(x:Int, y:Int, map:GameMap) {
 		super();
-		pos = new Point(x, y);
+		this.map = map;
+		pos = new Position(x, y, map);
 		time = 0;
 		image = new h2d.Bitmap(TileLoader.King(), this);
+		// Center the pivot for rotation
 		image.tile.dx = -8;
 		image.tile.dy = -8;
 		image.setPosition(8, 8);
 	}
 
 	public function gameUpdate() {
-		var end = new Point(pos.x, pos.y);
-		if (x == 0 && y < 15) {
-			end.y += 1;
-		}
-		if (x < 15 && y == 15) {
-			end.x += 1;
-		}
-		if (x == 15 && y > 0) {
-			end.y -= 1;
-		}
-		if (x > 0 && y == 0) {
-			end.x -= 1;
-		}
-
+		var end = map.Move(pos);
 		this.animation = new MoveAnimation(image, pos, end, 1.5);
 		pos = end;
 	}

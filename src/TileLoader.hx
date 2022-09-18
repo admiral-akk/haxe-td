@@ -40,4 +40,16 @@ class TileLoader {
 	public static function Guard():h2d.Tile {
 		return GetLoader().tiles[23 * 6 + 21];
 	}
+
+	public static function Town():h2d.Tile {
+		return GetLoader().tiles[7 * 23 + 7];
+	}
+
+	public static function Spawn():h2d.Tile {
+		return GetLoader().tiles[4];
+	}
+
+	public static function Creep():h2d.Tile {
+		return GetLoader().tiles[23 * 3 + 19];
+	}
 }

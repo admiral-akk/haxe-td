@@ -1,25 +1,49 @@
+import creep.King;
+
 class GameMap extends h2d.Object {
+	public var xDim:Int;
+	public var yDim:Int;
+	public var buildings:Array<Building>;
+
 	var map:Array<Array<Ground>>;
+	var spawns:Array<Array<Null<Spawn>>>;
+	var creeps:Array<Array<Null<King>>>;
+	var towers:Array<Array<Null<Tower>>>;
+
+	var pathfinder:Pathfinder;
 
 	public function new() {
 		super();
+		xDim = 32;
+		yDim = 16;
 		map = new Array();
+		buildings = new Array();
+		spawns = new Array();
+		creeps = new Array();
+		towers = new Array();
 		for (y in 0...16) {
-			var arr = new Array();
+			map.push(new Array());
+			spawns.push(new Array());
+			creeps.push(new Array());
+			towers.push(new Array());
 			for (x in 0...32) {
-				var g = new Ground(x, y);
-				addChild(g);
-				arr.insert(arr.length, g);
+				map[y].push(new Ground(x, y, this));
+				if (x > 25 && x < 30 && y > 5 && y < 10) {
+					buildings.push(new Building(x, y, this));
+				}
+				if (x > 2 && x < 5 && y > 6 && y < 9) {
+					spawns[y].push(new Spawn(x, y, this));
+				} else {
+					spawns[y].push(null);
+				}
+				creeps[y].push(null);
+				towers[y].push(null);
 			}
-			map.insert(map.length, arr);
 		}
+		pathfinder = new Pathfinder(this);
 	}
 
-	public function getMove(start:Point):Point {
-		return new Point(start.x + 1, start.y);
-	}
-
-	public function spawnCreep(start:Point):Creep {
-		return new Creep(start, this);
+	public function Move(start:Position):Position {
+		return pathfinder.Move(start);
 	}
 }

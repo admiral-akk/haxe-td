@@ -52,7 +52,7 @@ class Main2d extends hxd.App {
 				}
 				// tileGroup.add(x * tileWidth, y * tileHeight, ground);
 			}
-		king = new King(0, 0);
+		king = new King(0, 0, map);
 		map.addChild(king);
 	}
 
