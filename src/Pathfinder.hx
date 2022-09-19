@@ -12,14 +12,11 @@ class Pathfinder {
 	public function Recompute() {
 		dist = new HashMap();
 		var queue = new Array();
-		for (building in map.buildings) {
-			dist[building.pos] = 0;
-			for (neighbour in building.pos.Neighbours()) {
+		for (pos in map.getBuildings().map(e -> cast(e, component.Location).pos)) {
+			dist[pos] = 0;
+			for (neighbour in pos.Neighbours()) {
 				queue.push(neighbour);
 			}
-		}
-		for (tower in map.towers) {
-			dist.set(tower.pos, 1000);
 		}
 		while (queue.length > 0) {
 			var next = queue.pop();
@@ -28,6 +25,11 @@ class Pathfinder {
 			}
 
 			var minDist = 1000;
+			var buildings = map.get(next).filter(entity -> Std.isOfType(entity, Building));
+			if (buildings.length > 0) {
+				dist.set(next, minDist);
+				continue;
+			}
 
 			for (neighbour in next.Neighbours()) {
 				if (!dist.exists(neighbour)) {

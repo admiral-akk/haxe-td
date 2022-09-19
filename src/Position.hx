@@ -39,7 +39,13 @@ class Position {
 		return x + 1000 * y;
 	}
 
-	public function isTown():Bool {
-		return map.buildings.exists(this);
+	public function get():Array<entity.Entity> {
+		return map.get(this);
+	}
+
+	public function move(entity:entity.Entity, end:Position) {
+		map.moveEntity(entity, end);
+		this.x = end.x;
+		this.y = end.y;
 	}
 }

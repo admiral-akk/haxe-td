@@ -1,5 +1,3 @@
-import creep.King;
-
 class Main2d extends hxd.App {
 	// var king:King;
 	var target:h2d.Bitmap;
@@ -11,6 +9,7 @@ class Main2d extends hxd.App {
 
 	override private function init():Void {
 		super.init();
+		time = 2;
 		s2d.scaleMode = h2d.Scene.ScaleMode.LetterBox(512, 512);
 		systems = new Array();
 		entities = new Map();
@@ -65,12 +64,15 @@ class Main2d extends hxd.App {
 		// king = new King(20, 6, map);
 		// map.addChild(king);
 
-		manager = new SystemManager();
+		manager = new SystemManager(map);
 
 		manager.addSystem(new system.AttackTown(manager));
 		manager.addSystem(new system.Animate(manager));
 		manager.addSystem(new system.Movement(manager));
 		manager.addEntity(new entity.King(0, 20, 6, map));
+		for (x in 26...30)
+			for (y in 6...10)
+				manager.addEntity(new entity.Town(0, x, y, map));
 	}
 
 	override function update(dt:Float) {
