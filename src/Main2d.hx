@@ -7,6 +7,7 @@ class Main2d extends hxd.App {
 
 	var systems:Array<system.System>;
 	var entities:Map<Int, entity.Entity>;
+	var manager:SystemManager;
 
 	override private function init():Void {
 		super.init();
@@ -64,29 +65,19 @@ class Main2d extends hxd.App {
 		// king = new King(20, 6, map);
 		// map.addChild(king);
 
-		systems.push(new system.Animate());
-		systems.push(new system.Movement());
-		addEntity(new entity.King(0, 20, 6, map));
-	}
+		manager = new SystemManager();
 
-	function addEntity(entity:entity.Entity) {
-		entities[entity.id] = entity;
-		for (system in systems) {
-			system.maybeAdd(entity);
-		}
+		manager.addSystem(new system.AttackTown(manager));
+		manager.addSystem(new system.Animate(manager));
+		manager.addSystem(new system.Movement(manager));
+		manager.addEntity(new entity.King(0, 20, 6, map));
 	}
 
 	override function update(dt:Float) {
-		for (system in systems) {
-			system.updateView(dt);
-		}
-		// king.viewUpdate(dt);
+		manager.updateView(dt);
 		time -= dt;
 		if (time < 0) {
-			for (system in systems) {
-				system.updateModel();
-			}
-			//	king.gameUpdate();
+			manager.updateModel();
 			time += 2;
 		}
 	}

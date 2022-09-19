@@ -38,4 +38,8 @@ class Position {
 	public function hashCode():Int {
 		return x + 1000 * y;
 	}
+
+	public function isTown():Bool {
+		return map.buildings.exists(this);
+	}
 }

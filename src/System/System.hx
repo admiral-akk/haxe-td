@@ -2,6 +2,7 @@ package system;
 
 abstract class System {
 	var entities:Map<Int, entity.Entity>;
+	var manager:SystemManager;
 
 	abstract function applyView(entity:entity.Entity, dt:Float):Void;
 
@@ -27,7 +28,12 @@ abstract class System {
 		}
 	}
 
-	public function new() {
+	public function remove(entity:entity.Entity) {
+		entities.remove(entity.id);
+	}
+
+	public function new(manager:SystemManager) {
 		entities = new Map();
+		this.manager = manager;
 	}
 }
