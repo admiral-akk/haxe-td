@@ -26,6 +26,11 @@ class King extends h2d.Object {
 		var end = map.Move(pos);
 		this.animation = new MoveAnimation(image, pos, end, 1.5);
 		pos = end;
+		if (map.buildings.exists(end)) {
+			map.buildings[end].remove();
+			map.buildings.remove(end);
+			this.remove();
+		}
 	}
 
 	public function viewUpdate(dt:Float) {

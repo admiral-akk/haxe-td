@@ -1,13 +1,18 @@
 import creep.King;
 
 class Main2d extends hxd.App {
-	var king:King;
+	// var king:King;
 	var target:h2d.Bitmap;
 	var time:Float;
+
+	var systems:Array<system.System>;
+	var entities:Map<Int, entity.Entity>;
 
 	override private function init():Void {
 		super.init();
 		s2d.scaleMode = h2d.Scene.ScaleMode.LetterBox(512, 512);
+		systems = new Array();
+		entities = new Map();
 
 		var top_ui = new h2d.Object(s2d);
 		var font:h2d.Font = hxd.res.DefaultFont.get();
@@ -56,15 +61,32 @@ class Main2d extends hxd.App {
 				}
 				// tileGroup.add(x * tileWidth, y * tileHeight, ground);
 			}
-		king = new King(0, 0, map);
-		map.addChild(king);
+		// king = new King(20, 6, map);
+		// map.addChild(king);
+
+		systems.push(new system.Animate());
+		systems.push(new system.Movement());
+		addEntity(new entity.King(0, 20, 6, map));
+	}
+
+	function addEntity(entity:entity.Entity) {
+		entities[entity.id] = entity;
+		for (system in systems) {
+			system.maybeAdd(entity);
+		}
 	}
 
 	override function update(dt:Float) {
-		king.viewUpdate(dt);
+		for (system in systems) {
+			system.updateView(dt);
+		}
+		// king.viewUpdate(dt);
 		time -= dt;
 		if (time < 0) {
-			king.gameUpdate();
+			for (system in systems) {
+				system.updateModel();
+			}
+			//	king.gameUpdate();
 			time += 2;
 		}
 	}

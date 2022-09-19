@@ -4,21 +4,21 @@ import haxe.ds.HashMap;
 class GameMap extends h2d.Object {
 	public var xDim:Int;
 	public var yDim:Int;
-	public var buildings:Array<Building>;
+	public var buildings:HashMap<Position, Building>;
 	public var towers:HashMap<Position, Tower>;
 
 	var map:Array<Array<Ground>>;
 	var spawns:Array<Array<Null<Spawn>>>;
 	var creeps:Array<Array<Null<King>>>;
 
-	var pathfinder:Pathfinder;
+	public var pathfinder:Pathfinder;
 
 	public function new() {
 		super();
 		xDim = 32;
 		yDim = 16;
 		map = new Array();
-		buildings = new Array();
+		buildings = new HashMap();
 		spawns = new Array();
 		creeps = new Array();
 		towers = new HashMap();
@@ -29,7 +29,7 @@ class GameMap extends h2d.Object {
 			for (x in 0...32) {
 				map[y].push(new Ground(x, y, this));
 				if (x > 25 && x < 30 && y > 5 && y < 10) {
-					buildings.push(new Building(x, y, this));
+					buildings[new Position(x, y, this)] = new Building(x, y, this);
 				}
 				if (x > 2 && x < 5 && y > 6 && y < 9) {
 					spawns[y].push(new Spawn(x, y, this));
@@ -50,4 +50,6 @@ class GameMap extends h2d.Object {
 		towers.set(tower.pos, tower);
 		pathfinder.Recompute();
 	}
+
+	public function SpawnKing(start:Position) {}
 }

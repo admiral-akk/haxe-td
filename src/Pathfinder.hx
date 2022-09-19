@@ -18,13 +18,12 @@ class Pathfinder {
 				queue.push(neighbour);
 			}
 		}
+		for (tower in map.towers) {
+			dist.set(tower.pos, 1000);
+		}
 		while (queue.length > 0) {
 			var next = queue.pop();
 			if (dist.exists(next)) {
-				continue;
-			}
-			if (map.towers.exists(next)) {
-				dist.set(next, 1000);
 				continue;
 			}
 
@@ -35,8 +34,9 @@ class Pathfinder {
 					queue.push(neighbour);
 					continue;
 				}
-				if (dist[neighbour] < minDist) {
-					minDist = dist[neighbour] + 1;
+				var newDist = dist[neighbour] + 1;
+				if (newDist < minDist) {
+					minDist = newDist;
 				}
 			}
 			dist.set(next, minDist);

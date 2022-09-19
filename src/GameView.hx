@@ -8,7 +8,8 @@ abstract class GameView extends h2d.Object {
 	public function new(x:Int, y:Int, map:GameMap) {
 		super();
 		pos = new Position(x, y, map);
-		image = new h2d.Bitmap(GetTile(), map);
-		image.setPosition(x * image.getSize().width, y * image.getSize().height);
+		map.addChild(this);
+		image = new h2d.Bitmap(GetTile(), this);
+		setPosition(x * image.getSize().width, y * image.getSize().height);
 	}
 }
